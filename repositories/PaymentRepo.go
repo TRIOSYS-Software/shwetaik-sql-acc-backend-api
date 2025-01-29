@@ -37,8 +37,14 @@ func (p *PaymentRepo) Create(payment *models.Payment) error {
 		}
 	}()
 
-	lastPayment := models.Payment{}
-	if err := tx.Last(&lastPayment).Error; err != nil && err != gorm.ErrRecordNotFound {
+	firstPayment := models.Payment{}
+	if err := tx.First(&firstPayment).Error; err != nil && err != gorm.ErrRecordNotFound {
+		tx.Rollback()
+		return err
+	}
+
+	firstPaymentDetail := models.PaymentDetail{}
+	if err := tx.First(&firstPaymentDetail).Error; err != nil && err != gorm.ErrRecordNotFound {
 		tx.Rollback()
 		return err
 	}
@@ -56,21 +62,32 @@ func (p *PaymentRepo) Create(payment *models.Payment) error {
 		return err
 	}
 
-	payment.DOCKEY = lastPayment.DOCKEY + 1
+	if firstPayment.DOCKEY > 0 {
+		payment.DOCKEY = PaymentDetailID
+	} else {
+		payment.DOCKEY = firstPaymentDetail.DTLKEY - 1
+	}
+
 	payment.CURRENCYRATE = currencyRate
 	payment.JOURNAL = paymentMethod.JOURNAL
 	payment.CURRENCYCODE = paymentMethod.CURRENCYCODE
-	payment.GLTRANSID = lastPayment.GLTRANSID + 1
+
+	if firstPayment.GLTRANSID > 0 {
+		payment.GLTRANSID = GLTransID
+	} else {
+		payment.GLTRANSID = firstPayment.GLTRANSID - 1
+	}
+
 	payment.LASTMODIFIED = uint(time.Now().Unix())
 
 	total := 0.0
 	for i := range payment.DETAILS {
-		lastPaymentDetail := models.PaymentDetail{}
-		if err := tx.Last(&lastPaymentDetail).Error; err != nil && err != gorm.ErrRecordNotFound {
-			tx.Rollback()
-			return err
+		if firstPaymentDetail.DTLKEY > 0 {
+			payment.DETAILS[i].DTLKEY = PaymentDetailID - 1
+		} else {
+			payment.DETAILS[i].DTLKEY = firstPaymentDetail.DTLKEY - int(i+1)
 		}
-		payment.DETAILS[i].DTLKEY = lastPaymentDetail.DTLKEY + uint(i+1)
+		payment.DETAILS[i].SEQ = uint(i+1) * 1000
 		total += payment.DETAILS[i].AMOUNT
 		payment.DETAILS[i].DOCKEY = payment.DOCKEY
 		payment.DETAILS[i].CURRENCYCODE = paymentMethod.CURRENCYCODE
@@ -79,7 +96,7 @@ func (p *PaymentRepo) Create(payment *models.Payment) error {
 			tx.Rollback()
 			return err
 		}
-		if err := p.createGLTrans(tx, payment.DETAILS[i].DESCRIPTION, payment, payment.DETAILS[i].AMOUNT, 0, payment.DETAILS[i].CURRENCYAMOUNT, 0, "S", payment.DETAILS[i].DTLKEY); err != nil {
+		if err := p.createGLTrans(tx, payment.DETAILS[i].CODE, payment.DETAILS[i].DESCRIPTION, payment, payment.DETAILS[i].AMOUNT, 0, payment.DETAILS[i].CURRENCYAMOUNT, 0, "S", payment.DETAILS[i].DTLKEY); err != nil {
 			tx.Rollback()
 			return err
 		}
@@ -87,7 +104,7 @@ func (p *PaymentRepo) Create(payment *models.Payment) error {
 	payment.DOCAMT = total
 	payment.LOCALDOCAMT = total
 
-	if err := p.createGLTrans(tx, payment.DESCRIPTION, payment, 0, payment.DOCAMT, 0, payment.LOCALDOCAMT, "M", payment.DOCKEY); err != nil {
+	if err := p.createGLTrans(tx, payment.PAYMENTMETHOD, payment.DESCRIPTION, payment, 0, payment.DOCAMT, 0, payment.LOCALDOCAMT, "M", payment.DOCKEY); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -104,6 +121,7 @@ func (p *PaymentRepo) Create(payment *models.Payment) error {
 
 func (p *PaymentRepo) createGLTrans(
 	tx *gorm.DB,
+	code string,
 	description *string,
 	payment *models.Payment,
 	dr float64,
@@ -111,24 +129,23 @@ func (p *PaymentRepo) createGLTrans(
 	localDr float64,
 	localCr float64,
 	tableType string,
-	fromKey uint,
+	fromKey int,
 ) error {
-	lastGLTrans := models.GLTrans{}
-	if err := tx.Last(&lastGLTrans).Error; err != nil && err != gorm.ErrRecordNotFound {
+	firstGLTrans := models.GLTrans{}
+	if err := tx.First(&firstGLTrans).Error; err != nil && err != gorm.ErrRecordNotFound {
 		return err
 	}
 
 	GLTrans := models.GLTrans{
-		DOCKEY:       lastGLTrans.DOCKEY + 1,
 		GLTRANSID:    int64(payment.GLTRANSID),
-		CODE:         payment.PAYMENTMETHOD,
+		CODE:         code,
 		AREA:         payment.AREA,
 		AGENT:        payment.AGENT,
 		PROJECT:      payment.PROJECT,
 		JOURNAL:      payment.JOURNAL,
 		CURRENCYCODE: payment.CURRENCYCODE,
 		CURRENCYRATE: payment.CURRENCYRATE,
-		DESCRIPTION:  description,
+		DESCRIPTION:  *description,
 		DR:           dr,
 		CR:           cr,
 		LOCALDR:      localDr,
@@ -138,6 +155,12 @@ func (p *PaymentRepo) createGLTrans(
 		FROMKEY:      fromKey,
 		TABLETYPE:    tableType,
 		CANCELLED:    payment.CANCELLED,
+	}
+
+	if firstGLTrans.DOCKEY > 0 {
+		GLTrans.DOCKEY = GLTransID
+	} else {
+		GLTrans.DOCKEY = firstGLTrans.DOCKEY - 1
 	}
 
 	return tx.Create(&GLTrans).Error

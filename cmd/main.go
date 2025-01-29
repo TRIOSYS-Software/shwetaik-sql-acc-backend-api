@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"shwetaik-sql-acc-backend-api/config"
 	"shwetaik-sql-acc-backend-api/controllers"
@@ -14,8 +15,14 @@ import (
 )
 
 func main() {
+	f, _ := os.OpenFile("echo.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	defer f.Close()
+
 	e := echo.New()
-	e.Use(middleware.Logger())
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: "time=${time_rfc3339_nano}, level=${level}, remote_ip=${remote_ip}, method=${method}, uri=${uri}, status=${status}, error=${error}, bytes_in=${bytes_in}, bytes_out=${bytes_out}\n",
+		Output: f,
+	}))
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"http://localhost:3000", "https://yourdomain.com"},

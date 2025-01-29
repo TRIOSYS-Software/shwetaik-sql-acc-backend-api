@@ -5,7 +5,7 @@ import (
 )
 
 type Payment struct {
-	DOCKEY            uint            `gorm:"primary_key;column:DOCKEY;autoincrement"`
+	DOCKEY            int             `gorm:"primary_key;column:DOCKEY;autoincrement"`
 	DOCNO             string          `gorm:"column:DOCNO"`
 	DOCTYPE           string          `gorm:"column:DOCTYPE"`
 	DOCDATE           time.Time       `gorm:"column:DOCDATE;autoCreateTime"`
@@ -38,7 +38,7 @@ type Payment struct {
 	LOCALDOCAMT       float64         `gorm:"column:LOCALDOCAMT"`
 	FROMDOCTYPE       *string         `gorm:"column:FROMDOCTYPE;default:NULL"`
 	BOUNCEDDATE       *time.Time      `gorm:"column:BOUNCEDDATE;default:NULL"`
-	GLTRANSID         uint            `gorm:"column:GLTRANSID"`
+	GLTRANSID         int             `gorm:"column:GLTRANSID"`
 	CANCELLED         bool            `gorm:"column:CANCELLED;default:0"`
 	DEPOSITKEY        *uint           `gorm:"column:DEPOSITKEY;default:NULL"`
 	FROMDOC           *string         `gorm:"column:FROMDOC;default:NULL"`

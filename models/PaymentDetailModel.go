@@ -5,8 +5,8 @@ import (
 )
 
 type PaymentDetail struct {
-	DTLKEY              uint       `gorm:"primary_key;column:DTLKEY"`
-	DOCKEY              uint       `gorm:"column:DOCKEY"`
+	DTLKEY              int        `gorm:"primary_key;column:DTLKEY"`
+	DOCKEY              int        `gorm:"column:DOCKEY"`
 	SEQ                 uint       `gorm:"column:SEQ"`
 	AREA                string     `gorm:"column:AREA;default:----"`
 	AGENT               string     `gorm:"column:AGENT;default:----"`
