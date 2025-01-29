@@ -2,14 +2,17 @@ package routes
 
 import (
 	"shwetaik-sql-acc-backend-api/controllers"
+	"shwetaik-sql-acc-backend-api/middlewares"
 
 	"github.com/labstack/echo/v4"
 )
 
 func PaymentRoutes(e *echo.Group, controller *controllers.PaymentController) {
-	e.GET("/payments", controller.GetAll)
-	e.GET("/payments/:docKey", controller.GetByDOCKEY)
-	e.POST("/payments", controller.Create)
+	paymentRouteGroup := e.Group("/payments")
+	paymentRouteGroup.Use(middlewares.AuthMiddleware)
+	paymentRouteGroup.GET("", controller.GetAll)
+	paymentRouteGroup.GET("/:docKey", controller.GetByDOCKEY)
+	paymentRouteGroup.POST("", controller.Create)
 }
 
 func PaymentMethodRoutes(e *echo.Group, controller *controllers.PaymentMethodController) {
