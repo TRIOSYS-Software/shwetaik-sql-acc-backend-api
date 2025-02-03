@@ -82,11 +82,7 @@ func (p *PaymentRepo) Create(payment *models.Payment) error {
 
 	total := 0.0
 	for i := range payment.DETAILS {
-		if firstPaymentDetail.DTLKEY > 0 {
-			payment.DETAILS[i].DTLKEY = PaymentDetailID - 1
-		} else {
-			payment.DETAILS[i].DTLKEY = firstPaymentDetail.DTLKEY - int(i+1)
-		}
+		payment.DETAILS[i].DTLKEY = payment.DOCKEY - (i + 1)
 		payment.DETAILS[i].SEQ = uint(i+1) * 1000
 		total += payment.DETAILS[i].AMOUNT
 		payment.DETAILS[i].DOCKEY = payment.DOCKEY
