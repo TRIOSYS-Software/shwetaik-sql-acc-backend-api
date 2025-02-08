@@ -13,7 +13,7 @@ func AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		cfg, err := config.GetConfig()
 		presharedKey := c.Request().Header.Get("ShweTaik")
 		if presharedKey == "" {
-			return c.JSON(http.StatusUnauthorized, "Unauthorized: Missing header")
+			return c.JSON(http.StatusUnauthorized, "Unauthorized")
 		}
 		decryptedKey, err := utilities.Decrypt(presharedKey, cfg.DefinedKey)
 		if err != nil {

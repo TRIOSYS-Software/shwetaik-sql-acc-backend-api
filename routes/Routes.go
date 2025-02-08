@@ -16,10 +16,18 @@ func PaymentRoutes(e *echo.Group, controller *controllers.PaymentController) {
 }
 
 func PaymentMethodRoutes(e *echo.Group, controller *controllers.PaymentMethodController) {
-	e.GET("/paymentMethods", controller.GetAll)
-	e.GET("/paymentMethods/:code", controller.GetByCode)
+	paymentMethodRouteGroup := e.Group("/paymentMethods", middlewares.AuthMiddleware)
+	paymentMethodRouteGroup.GET("", controller.GetAll)
+	paymentMethodRouteGroup.GET("/:code", controller.GetByCode)
 }
 
 func PaymentDetailRoutes(e *echo.Group, controller *controllers.PaymentDetailController) {
-	e.GET("/paymentDetails", controller.GetAll)
+	paymentDetailRouteGroup := e.Group("/payment-details", middlewares.AuthMiddleware)
+	paymentDetailRouteGroup.GET("", controller.GetAll)
+}
+
+func ProjectRoutes(e *echo.Group, controller *controllers.ProjectController) {
+	projectRouteGroup := e.Group("/projects", middlewares.AuthMiddleware)
+	projectRouteGroup.GET("", controller.GetAll)
+	projectRouteGroup.GET("/:code", controller.GetByCode)
 }

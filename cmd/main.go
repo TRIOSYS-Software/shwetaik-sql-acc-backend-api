@@ -56,5 +56,10 @@ func main() {
 	paymentDetailController := controllers.NewPaymentDetailController(paymentDetailService)
 	routes.PaymentDetailRoutes(apiV1, paymentDetailController)
 
+	projectRepo := repositories.NewProjectRepo(db)
+	projectService := services.NewProjectService(projectRepo)
+	projectController := controllers.NewProjectController(projectService)
+	routes.ProjectRoutes(apiV1, projectController)
+
 	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%s", cfg.ServerIP, cfg.ServerPort)))
 }
