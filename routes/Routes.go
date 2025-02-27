@@ -16,7 +16,7 @@ func PaymentRoutes(e *echo.Group, controller *controllers.PaymentController) {
 }
 
 func PaymentMethodRoutes(e *echo.Group, controller *controllers.PaymentMethodController) {
-	paymentMethodRouteGroup := e.Group("/paymentMethods", middlewares.AuthMiddleware)
+	paymentMethodRouteGroup := e.Group("/payment-methods", middlewares.AuthMiddleware)
 	paymentMethodRouteGroup.GET("", controller.GetAll)
 	paymentMethodRouteGroup.GET("/:code", controller.GetByCode)
 }

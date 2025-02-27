@@ -10,7 +10,7 @@ import (
 
 func AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		cfg, err := config.GetConfig()
+		cfg, _ := config.GetConfig()
 		presharedKey := c.Request().Header.Get("ShweTaik")
 		if presharedKey == "" {
 			return c.JSON(http.StatusUnauthorized, "Unauthorized")
