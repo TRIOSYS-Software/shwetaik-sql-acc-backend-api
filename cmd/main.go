@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"shwetaik-sql-acc-backend-api/config"
 	"shwetaik-sql-acc-backend-api/controllers"
@@ -19,21 +20,23 @@ func main() {
 	defer f.Close()
 
 	e := echo.New()
+	cfg, err := config.GetConfig()
+	if err != nil {
+		e.Logger.Fatal(err)
+	}
+
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: "time=${time_rfc3339_nano}, level=${level}, remote_ip=${remote_ip}, method=${method}, uri=${uri}, status=${status}, error=${error}, bytes_in=${bytes_in}, bytes_out=${bytes_out}\n",
 		Output: f,
 	}))
 	e.Use(middleware.Recover())
+	origins := strings.Split(cfg.AllowedOrigin, ",")
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:3000", "http://localhost:1234"},
+		AllowOrigins: origins,
 		AllowMethods: []string{echo.GET, echo.POST, echo.PUT, echo.DELETE},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, "shwetaik"},
 	}))
 
-	cfg, err := config.GetConfig()
-	if err != nil {
-		e.Logger.Fatal(err)
-	}
 	db, err := cfg.ConnectDB()
 	if err != nil {
 		e.Logger.Fatal(err)

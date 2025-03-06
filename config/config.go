@@ -15,6 +15,7 @@ type Config struct {
 	DBString           string
 	DefinedPreShareKey string
 	DefinedKey         string
+	AllowedOrigin      string
 }
 
 func GetConfig() (*Config, error) {
@@ -42,6 +43,10 @@ func GetConfig() (*Config, error) {
 	config.DefinedKey = os.Getenv("DEFINED_KEY")
 	if config.DefinedKey == "" {
 		return nil, fmt.Errorf("defined key is empty")
+	}
+	config.AllowedOrigin = os.Getenv("ALLOWED_ORIGIN")
+	if config.AllowedOrigin == "" {
+		config.AllowedOrigin = "http://localhost:3000,http://localhost:1234"
 	}
 	return config, nil
 }
