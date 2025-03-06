@@ -12,6 +12,7 @@ type PaymentMethod struct {
 	GIRO              []byte  `gorm:"column:GIRO;type:BLOB SUB_TYPE BINARY"`
 	DATA              []byte  `gorm:"column:DATA;type:BLOB SUB_TYPE BINARY"`
 	ATTACHMENTS       []byte  `gorm:"column:ATTACHMENTS;type:BLOB SUB_TYPE BINARY"`
+	DESCRIPTION       string
 }
 
 func (PaymentMethod) TableName() string {

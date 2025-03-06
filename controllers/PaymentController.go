@@ -47,5 +47,5 @@ func (p *PaymentController) Create(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusCreated, payment)
+	return c.JSON(http.StatusOK, payment)
 }

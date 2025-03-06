@@ -16,7 +16,8 @@ func NewPaymentMethodRepo(db *gorm.DB) *PaymentMethodRepo {
 
 func (p *PaymentMethodRepo) GetAll() ([]models.PaymentMethod, error) {
 	var paymentMethods []models.PaymentMethod
-	err := p.db.Find(&paymentMethods).Error
+	err := p.db.Raw("SELECT pm.*, gl.DESCRIPTION FROM PMMETHOD pm JOIN GL_ACC gl ON pm.CODE = gl.CODE").Scan(&paymentMethods).Error
+	// err := p.db.Joins("JOIN GL_ACC gl ON gl.code = PMMETHOD.code").Find(&paymentMethods).Error
 	return paymentMethods, err
 }
 
