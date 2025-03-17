@@ -31,3 +31,9 @@ func ProjectRoutes(e *echo.Group, controller *controllers.ProjectController) {
 	projectRouteGroup.GET("", controller.GetAll)
 	projectRouteGroup.GET("/:code", controller.GetByCode)
 }
+
+func GLAccRoutes(e *echo.Group, controller *controllers.GLAccController) {
+	GLAccRouteGroup := e.Group("/gl-accounts")
+	GLAccRouteGroup.GET("", controller.GetAll)
+	GLAccRouteGroup.GET("/low-level", controller.GetAllLowLevel)
+}

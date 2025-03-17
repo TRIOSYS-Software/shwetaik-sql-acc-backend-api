@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"shwetaik-sql-acc-backend-api/models"
+	"shwetaik-sql-acc-backend-api/utilities"
 
 	"gorm.io/gorm"
 )
@@ -63,7 +64,7 @@ func (p *PaymentRepo) Create(payment *models.Payment) error {
 	}
 
 	if firstPayment.DOCKEY > 0 {
-		payment.DOCKEY = PaymentDetailID
+		payment.DOCKEY = utilities.PaymentDetailID
 	} else {
 		payment.DOCKEY = firstPaymentDetail.DTLKEY - 1
 	}
@@ -73,7 +74,7 @@ func (p *PaymentRepo) Create(payment *models.Payment) error {
 	payment.CURRENCYCODE = paymentMethod.CURRENCYCODE
 
 	if firstPayment.GLTRANSID > 0 {
-		payment.GLTRANSID = GLTransID
+		payment.GLTRANSID = utilities.GLTransID
 	} else {
 		payment.GLTRANSID = firstPayment.GLTRANSID - 1
 	}
@@ -154,7 +155,7 @@ func (p *PaymentRepo) createGLTrans(
 	}
 
 	if firstGLTrans.DOCKEY > 0 {
-		GLTrans.DOCKEY = GLTransID
+		GLTrans.DOCKEY = utilities.GLTransID
 	} else {
 		GLTrans.DOCKEY = firstGLTrans.DOCKEY - 1
 	}

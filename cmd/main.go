@@ -64,5 +64,10 @@ func main() {
 	projectController := controllers.NewProjectController(projectService)
 	routes.ProjectRoutes(apiV1, projectController)
 
+	glAccRepo := repositories.NewGLAccRepo(db)
+	glAccService := services.NewGLAccService(glAccRepo)
+	glAccController := controllers.NewGLAccController(glAccService)
+	routes.GLAccRoutes(apiV1, glAccController)
+
 	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%s", cfg.ServerIP, cfg.ServerPort)))
 }

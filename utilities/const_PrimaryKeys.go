@@ -1,4 +1,4 @@
-package repositories
+package utilities
 
 const (
 	GLTransID       = -1
