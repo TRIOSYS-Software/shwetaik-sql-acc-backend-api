@@ -33,7 +33,7 @@ func ProjectRoutes(e *echo.Group, controller *controllers.ProjectController) {
 }
 
 func GLAccRoutes(e *echo.Group, controller *controllers.GLAccController) {
-	GLAccRouteGroup := e.Group("/gl-accounts")
+	GLAccRouteGroup := e.Group("/gl-accounts", middlewares.AuthMiddleware)
 	GLAccRouteGroup.GET("", controller.GetAll)
 	GLAccRouteGroup.GET("/low-level", controller.GetAllLowLevel)
 }

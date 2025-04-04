@@ -28,16 +28,26 @@ func Encrypt(text string, key string) (string, error) {
 }
 
 func Decrypt(text string, key string) (string, error) {
-	cipherText, _ := base64.StdEncoding.DecodeString(text)
+	cipherText, err := base64.StdEncoding.DecodeString(text)
+	if err != nil {
+		return "", err
+	}
+
 	block, err := aes.NewCipher([]byte(key))
 	if err != nil {
 		return "", err
 	}
+
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
 		return "", err
 	}
+
 	nonceSize := gcm.NonceSize()
+	if len(cipherText) < nonceSize {
+		return "", err
+	}
+
 	nonce, cipherText := cipherText[:nonceSize], cipherText[nonceSize:]
 	plainText, err := gcm.Open(nil, nonce, cipherText, nil)
 	if err != nil {

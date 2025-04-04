@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"shwetaik-sql-acc-backend-api/dtos"
 	"shwetaik-sql-acc-backend-api/models"
 
 	"gorm.io/gorm"
@@ -14,11 +15,12 @@ func NewPaymentMethodRepo(db *gorm.DB) *PaymentMethodRepo {
 	return &PaymentMethodRepo{db: db}
 }
 
-func (p *PaymentMethodRepo) GetAll() ([]models.PaymentMethod, error) {
-	var paymentMethods []models.PaymentMethod
-	err := p.db.Raw("SELECT pm.*, gl.DESCRIPTION FROM PMMETHOD pm JOIN GL_ACC gl ON pm.CODE = gl.CODE").Scan(&paymentMethods).Error
+func (p *PaymentMethodRepo) GetAll() ([]dtos.PaymentMethodRequestDTO, error) {
+	// var paymentMethods []models.PaymentMethod
+	var paymentMethodRequestDTO []dtos.PaymentMethodRequestDTO
+	err := p.db.Raw("SELECT pm.*, gl.DESCRIPTION FROM PMMETHOD pm JOIN GL_ACC gl ON pm.CODE = gl.CODE").Scan(&paymentMethodRequestDTO).Error
 	// err := p.db.Joins("JOIN GL_ACC gl ON gl.code = PMMETHOD.code").Find(&paymentMethods).Error
-	return paymentMethods, err
+	return paymentMethodRequestDTO, err
 }
 
 func (p *PaymentMethodRepo) GetByCode(code string) (*models.PaymentMethod, error) {

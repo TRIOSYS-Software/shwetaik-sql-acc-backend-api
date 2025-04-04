@@ -22,6 +22,6 @@ func (p *GLAccRepo) GetAll() ([]models.GLAcc, error) {
 
 func (p *GLAccRepo) GetAllLowLevel() ([]models.GLAcc, error) {
 	var glAccs []models.GLAcc
-	err := p.db.Where("NOT (PARENT = -1)").Find(&glAccs).Error
+	err := p.db.Where("NOT (PARENT = -1) AND CODE NOT LIKE '4%%-%'").Find(&glAccs).Error
 	return glAccs, err
 }
