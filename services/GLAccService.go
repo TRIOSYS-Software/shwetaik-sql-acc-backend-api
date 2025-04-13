@@ -20,3 +20,7 @@ func (p *GLAccService) GetAll() ([]models.GLAcc, error) {
 func (p *GLAccService) GetAllLowLevel() ([]models.GLAcc, error) {
 	return p.repo.GetAllLowLevel()
 }
+
+func (p *GLAccService) FilterByCodes(code string) (*[]models.GLAcc, error) {
+	return p.repo.FilterByCodes(code)
+}

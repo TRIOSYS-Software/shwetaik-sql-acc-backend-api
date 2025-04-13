@@ -30,3 +30,12 @@ func (p *GLAccController) GetAllLowLevel(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, GLAcc)
 }
+
+func (p *GLAccController) FilterByCodes(c echo.Context) error {
+	code := c.QueryParam("codes")
+	GLAcc, err := p.GLAccService.FilterByCodes(code)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, GLAcc)
+}
